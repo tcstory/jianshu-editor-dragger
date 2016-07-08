@@ -8,20 +8,14 @@ function Dragger(opts) {
     }
     this._children = document.getElementsByClassName(opts.classNameOfChildren);
     this._mirror_children = Array.from(this._children);
-    this._mirror_children.forEach((item, index, original) => {
-        item.dataset.drag = '0';
-        item.dataset.mousedown = '0';
-        item.addEventListener('mousedown', (ev) => {
-            this._handle_item_mousedown(ev);
-        });
-    });
+    this._bind_events();
     if (typeof opts.callback !== 'function') {
         this._callback = function () {
         }
     } else {
         this._callback = opts.callback;
     }
-    this._container = document.querySelector('.' + opts.classNameOfContainer);
+    this._container = document.querySelector(`.${opts.classNameOfContainer}`);
     this._rect = {
         container: this._container.getBoundingClientRect()
     };
@@ -31,7 +25,10 @@ function Dragger(opts) {
 }
 
 Dragger.prototype.update = function () {
+    this._max_scroll_height = this._container.scrollHeight;
     this._mirror_children = Array.from(this._children);
+    this._bind_events();
+    this._handle_item_mouseup();
     this._holder.update();
 };
 
@@ -41,6 +38,17 @@ Dragger.prototype._init = function () {
     });
     window.addEventListener('mousemove', (ev) => {
         this._handle_item_mousemove(ev)
+    });
+};
+
+Dragger.prototype._bind_events = function () {
+    this._mirror_children.forEach((item) => {
+        if (item.dataset.fn !== '1') {
+            item.dataset.fn = '1';
+            item.addEventListener('mousedown', (ev) => {
+                this._handle_item_mousedown(ev);
+            });
+        }
     });
 };
 
