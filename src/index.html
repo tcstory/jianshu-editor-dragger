@@ -7,9 +7,13 @@
     <style>
         .directory {
             width: 18.75rem;
-            height: 100%;
-            overflow: hidden;
+            height: 40em;
+            overflow: scroll;
             border: .0625em solid hsl(0, 0%, 85%);
+            position: relative;
+        }
+        .directory::-webkit-scrollbar {
+            display: none;
         }
         .note {
             width: 100%;
@@ -17,6 +21,18 @@
             border-bottom: .0625em solid hsl(0, 0%, 85%);
             align-items: center;
             cursor: pointer;
+        }
+        .holder {
+            width: 100%;
+            height: 5.5rem;
+            background: gray;
+        }
+        .note[data-mousedown="1"] {
+            background-color: yellow;
+        }
+        .note[data-drag="1"] {
+            background-color: green;
+            position: absolute;
         }
     </style>
 </head>
