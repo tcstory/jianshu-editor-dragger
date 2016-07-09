@@ -56,7 +56,7 @@ Dragger.prototype._handle_item_mousedown = function (ev) {
     _reset_prop(this._mirror_children, 'mousedown', '0');
     ev.target.dataset.mousedown = '1';
     ev.target.dataset.deltay = ev.clientY - ev.target.getBoundingClientRect().top;
-}
+};
 
 Dragger.prototype._handle_item_mousemove = function (ev) {
     let {target} = _get_target_item(this._mirror_children, 'mousedown', '1');
@@ -91,7 +91,6 @@ function Holder(holder, parent, items, callback) {
     this._items = items;
     this._mirror_items = Array.from(this._items);
     this._time_id = -1;
-    this._interval = 150;
     this._pos = -1;
     this._callback = callback;
     this._half = parseFloat(getComputedStyle(this._items[0], null).height) / 2;
@@ -121,17 +120,11 @@ Holder.prototype._update_pos = function () {
     }, 0)
 };
 
-Holder.prototype.insert = function () {
-    if (this._time_id === -1) {
+Holder.prototype.insert = _throttle(function () {
+    if (_whether(this._mirror_items, 'drag', '1')) {
         this._add_holder();
-        this._time_id = setTimeout(() => {
-            this._time_id = -1;
-            if (_whether(this._mirror_items, 'drag', '1')) {
-                this._add_holder();
-            }
-        }, this._interval);
     }
-};
+}, 150);
 
 Holder.prototype.remove = function () {
     let {target} = _get_target_item(this._mirror_items, 'drag', '1');
@@ -195,6 +188,22 @@ function _whether(items, prop, val) {
         }
     }
     return flag;
+}
+
+function _throttle(fn, interval= 150) {
+    let time_id = -1;
+    let first_time = true;
+    return function (...args) {
+        if (first_time) {
+            first_time = false;
+            fn.apply(this, args);
+        } else if (time_id === -1) {
+            time_id = setTimeout(() => {
+                time_id = -1;
+                fn.apply(this, args);
+            }, interval)
+        }
+    }
 }
 
 export default Dragger;
